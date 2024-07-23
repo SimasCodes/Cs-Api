@@ -1,5 +1,5 @@
 {
-  "name": "Cs-Api",
+  "name": "node_cs_api_lpbd_20212",
   "version": "1.0.0",
   "description": "projeto para a disciplina de lpbd 2021 2",
   "main": "index.js",
@@ -19,7 +19,7 @@
     "postgres",
     "pg"
   ],
-  "author": "SimasCodes",
+  "author": "telmo junior",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/SimasCodes/Cs-Api/issues"
