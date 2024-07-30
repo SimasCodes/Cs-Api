@@ -34,7 +34,7 @@ sw.get('/', (req, res) => {
 
 
 sw.listen(4000, function () {
-    console.log('Server is running.. on Port 4000');
+    console.log('Servidor ta bombando na porta 4milão');
 });
 
 
