@@ -29,7 +29,7 @@ sw.get('/', (req, res) => {
     res.send('NÃO OLHE PRA TRAS');
 })
 
-sw.get('/', (req, res) => {
+sw.get('/cuidado', (req, res) => {
     res.send('CUIDADO!!!!!!!');
 })
 
