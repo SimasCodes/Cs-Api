@@ -35,6 +35,35 @@ sw.get('/cuidado', (req, res) => {
 
 
 
+sw.get('/listendereco', function (req, res, next) {
+    
+    postgres.connect(function(err,client,done) {
+
+       if(err){
+
+           console.log("Nao conseguiu acessar o  BD "+ err);
+           res.status(400).send('{'+err+'}');
+       }else{            
+
+            var q ='select e.codigo, e.complemento, e.cep, j.nickname from tb_endereco e, tb_jogador j where e.nicknamejogador=j.nickname order by e.codigo asc';            
+    
+            client.query(q,function(err,result) {
+                done(); // closing the connection;
+                if(err){
+                    console.log('retornou 400 no listendereco');
+                    console.log(err);
+                    
+                    res.status(400).send('{'+err+'}');
+                }else{
+
+                    //console.log('retornou 201 no /listendereco');
+                    res.status(201).send(result.rows);
+                }           
+            });
+       }       
+    });
+});
+
 sw.listen(4000, function () {
     console.log('Servidor ta bombando na porta 4milão');
 });
