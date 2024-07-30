@@ -26,7 +26,7 @@ const postgres = new pg.Pool(config);
 
 //definicao do primeiro serviço web.
 sw.get('/', (req, res) => {
-    res.send('Hello, world! meu primeiro teste.  #####');
+    res.send('NÃO OLHE PRA TRAS');
 })
 
 
