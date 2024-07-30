@@ -16,8 +16,8 @@ sw.use(function(req, res, next) {
 const config = {
     host: 'localhost',
     user: 'postgres',
-    database: 'db_cs_prog3_2022',
-    password: '123456',
+    database: 'db_cs_2024',
+    password: 'postgres',
     port: 5432
 };
 
