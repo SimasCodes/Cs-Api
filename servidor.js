@@ -68,6 +68,44 @@ sw.get('/listendereco', function (req, res, next) {
     });
 });
 
+
+
+
+
+
+
+
+
+sw.get('/listpatente', function (req, res, next) {
+    
+    postgres.connect(function(err,client,done) {
+
+       if(err){
+
+           console.log("Nao conseguiu acessar o  BD "+ err);
+           res.status(400).send('{'+err+'}');
+       }else{            
+
+            var q ='select codigo, nome, quant_min_pontos, cor, logotipo, to_char(datacriacao, \'dd/mm/yyyy/ hh24:mi:ss\') as datacriacao from tb_patente order by codigo asc';            
+    
+            client.query(q,function(err,result) {
+                done(); // closing the connection;
+                if(err){
+                    console.log('retornou 400 no listpatente');
+                    console.log(err);
+                    
+                    res.status(400).send('{'+err+'}');
+                }else{
+
+                    //console.log('retornou 201 no /listpatente');
+                    res.status(201).send(result.rows);
+                }           
+            });
+       }       
+    });
+});
+
+
 sw.listen(4000, function () {
     console.log('Servidor ta bombando na porta 4milão');
 });
