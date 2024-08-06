@@ -126,7 +126,7 @@ sw.get('/listjogador', function (req, res, next) {
            res.status(400).send('{'+err+'}');
        }else{            
 
-            var q ='select nickname, senha, quantpontos, quantdinheiro, datacadastro, data_ultimo_login, situacao, to_char(datacriacao, \'dd/mm/yyyy hh24:mi:ss\') as datacriacao from tb_jogador order by codigo asc';            
+            var q ='select nickname, senha, quantpontos, quantdinheiro, datacadastro, data_ultimo_login, situacao, to_char(datacadastro, \'dd/mm/yyyy hh24:mi:ss\') as datacadastro from tb_jogador order by codigo asc';            
     
             client.query(q,function(err,result) {
                 done(); // closing the connection;
