@@ -48,7 +48,7 @@ sw.get('/listendereco', function (req, res, next) {
            res.status(400).send('{'+err+'}');
        }else{            
 
-            var q ='select * from tb_endereco';            
+            var q ='select codigo, complemento, cep, nicknamejogador' + 'from tb_endereco order by codigo asc';            
     
             client.query(q,function(err,result) {
                 done(); // closing the connection;
