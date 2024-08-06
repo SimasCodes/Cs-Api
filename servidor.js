@@ -106,6 +106,48 @@ sw.get('/listpatente', function (req, res, next) {
 });
 
 
+
+
+
+
+
+
+
+
+
+
+sw.get('/listjogador', function (req, res, next) {
+    
+    postgres.connect(function(err,client,done) {
+
+       if(err){
+
+           console.log("Nao conseguiu acessar o  BD "+ err);
+           res.status(400).send('{'+err+'}');
+       }else{            
+
+            var q ='select nickname,senha, quantpontos, quantdinheiro, datacadastro, data_ultimo_login, situacao to_char(datacriacao, \'dd/mm/yyyy/ hh24:mi:ss\') as datacriacao from tb_jogador order by codigo asc';            
+    
+            client.query(q,function(err,result) {
+                done(); // closing the connection;
+                if(err){
+                    console.log('retornou 400 no listjogador');
+                    console.log(err);
+                    
+                    res.status(400).send('{'+err+'}');
+                }else{
+
+                    //console.log('retornou 201 no /listjogador');
+                    res.status(201).send(result.rows);
+                }           
+            });
+       }       
+    });
+});
+
+
+
+
 sw.listen(4000, function () {
     console.log('Servidor ta bombando na porta 4milão');
 });
