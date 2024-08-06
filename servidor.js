@@ -33,6 +33,9 @@ sw.get('/cuidado', (req, res) => {
     res.send('CUIDADO!!!!!!!');
 })
 
+sw.get('/cuidado2', (req, res) => {
+    res.status(201).send('CUIDADO!!!!!!!');
+})
 
 
 sw.get('/listendereco', function (req, res, next) {
