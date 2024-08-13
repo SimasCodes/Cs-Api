@@ -125,7 +125,7 @@ sw.get('/listjogadores', function (req, res, next) {
            console.log("Nao conseguiu acessar o  BD "+ err);
            res.status(400).send('{'+err+'}');
        }else{            
-
+      
             var q ='select nickname, senha, quantpontos, quantdinheiro, datacadastro, data_ultimo_login, situacao, to_char(datacadastro, \'dd/mm/yyyy hh24:mi:ss\') as datacadastro from tb_jogador order by nickname asc';            
     
             client.query(q,function(err,result) {
@@ -136,7 +136,16 @@ sw.get('/listjogadores', function (req, res, next) {
                     
                     res.status(400).send('{'+err+'}');
                 }else{
-
+                    for(var i=0; i < result.rows.length; i++){
+                        try{
+                            pj = await client.query('select codpatente, 0 as patentes from' +
+                            'tb_jogador_conquista_patente'+
+                            'where nickname = $1', [result.rows[i].nickname])
+                            result.rows[i].patentes = pj.rows;
+                        }catch(err){
+                            
+                        }
+                    }
                     //console.log('retornou 201 no /listjogador');
                     res.status(201).send(result.rows);
                 }           
