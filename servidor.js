@@ -129,7 +129,7 @@ sw.get('/listjogadores', function (req, res, next) {
             var q ='select j.nickname, j.senha, 0 as patentes, e.cep ' +
             'from tb_jogador j, tb_endereco e '+
              'where e.nicknamejogador=j.nickname order by nickname asc;'
-    
+    //exerxicio 1 incluir todas as colunas tb_jogador
             client.query(q,async function(err,result) {
             
                 if(err){
@@ -139,7 +139,7 @@ sw.get('/listjogadores', function (req, res, next) {
                     res.status(400).send('{'+err+'}');
                 }else{
                     for(var i=0; i < result.rows.length; i++){
-                        try{
+                        try{//exerxicio 2 incluir todas as coluanas de tb_patente
                             pj = await client.query('select codpatente, 0 as patentes from ' +
                             'tb_jogador_conquista_patente '+
                             'where nickname = $1', [result.rows[i].nickname])
