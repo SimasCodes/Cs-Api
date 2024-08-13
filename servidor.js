@@ -138,12 +138,12 @@ sw.get('/listjogadores', function (req, res, next) {
                 }else{
                     for(var i=0; i < result.rows.length; i++){
                         try{
-                            pj = await client.query('select codpatente, 0 as patentes from' +
+                            pj = client.query('select codpatente, 0 as patentes from' +
                             'tb_jogador_conquista_patente'+
                             'where nickname = $1', [result.rows[i].nickname])
                             result.rows[i].patentes = pj.rows;
                         }catch(err){
-                            
+
                         }
                     }
                     //console.log('retornou 201 no /listjogador');
