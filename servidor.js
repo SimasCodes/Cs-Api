@@ -131,7 +131,7 @@ sw.get('/listjogadores', function (req, res, next) {
              'where e.nicknamejogador=j.nickname order by nickname asc;'
     
             client.query(q,async function(err,result) {
-                done(); // closing the connection;
+            
                 if(err){
                     console.log('retornou 400 no listjogador');
                     console.log(err);
@@ -148,6 +148,7 @@ sw.get('/listjogadores', function (req, res, next) {
 
                         }
                     }
+                    done(); // closing the connection;
                     //console.log('retornou 201 no /listjogador');
                     res.status(201).send(result.rows);
                 }           
