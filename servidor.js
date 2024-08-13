@@ -126,7 +126,9 @@ sw.get('/listjogadores', function (req, res, next) {
            res.status(400).send('{'+err+'}');
        }else{            
       
-            var q ='select nickname, senha, quantpontos, quantdinheiro, datacadastro, data_ultimo_login, situacao, to_char(datacadastro, \'dd/mm/yyyy hh24:mi:ss\') as datacadastro from tb_jogador order by nickname asc';            
+            var q ='  select j.nickname, j.senha, 0 as patentes, e.cep' +
+            'from tb_jogador j, tb_endereco e '+
+             'where e.nicknamejogador=j.nickname order by nickname asc;';
     
             client.query(q,function(err,result) {
                 done(); // closing the connection;
