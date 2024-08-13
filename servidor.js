@@ -126,7 +126,7 @@ sw.get('/listjogadores', function (req, res, next) {
            res.status(400).send('{'+err+'}');
        }else{            
       
-            var q ='  select j.nickname, j.senha, 0 as patentes, e.cep' +
+            var q ='select j.nickname, j.senha, 0 as patentes, e.cep ' +
             'from tb_jogador j, tb_endereco e '+
              'where e.nicknamejogador=j.nickname order by nickname asc;'
     
