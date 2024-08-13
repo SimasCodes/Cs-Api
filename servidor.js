@@ -38,7 +38,7 @@ sw.get('/cuidado2', (req, res) => {
 })
 
 
-sw.get('/listendereco', function (req, res, next) {
+sw.get('/listenderecos', function (req, res, next) {
     
     postgres.connect(function(err,client,done) {
 
@@ -76,7 +76,7 @@ sw.get('/listendereco', function (req, res, next) {
 
 
 
-sw.get('/listpatente', function (req, res, next) {
+sw.get('/listpatentes', function (req, res, next) {
     
     postgres.connect(function(err,client,done) {
 
@@ -116,7 +116,7 @@ sw.get('/listpatente', function (req, res, next) {
 
 
 
-sw.get('/listjogador', function (req, res, next) {
+sw.get('/listjogadores', function (req, res, next) {
     
     postgres.connect(function(err,client,done) {
 
