@@ -180,21 +180,20 @@ sw.post('/insertpatente', function (req, res, next) {
 
             var q1 ={
                 text: 'insert into tb_patente (nome, quant_min_pontos, datacriacao, cor, datacadastro, ' +
-                   ' situacao) ' +
+                   ') ' +
                 ' values ($1,$2,$3,$4,now(), $5) ' +
                                             'returning nome, quant_min_pontos, datacriacao, cor, ' +
-                                            ' to_char(datacadastro, \'dd/mm/yyyy\') as datacadastro, '+
-                                            ' to_char(data_ultimo_login, \'dd/mm/yyyy\') as data_ultimo_login, situacao;',
+                                            ' to_char(datacadastro, \'dd/mm/yyyy\') as datacadastro, '
+                                           ,
                 values: [req.body.nome, 
                          req.body.quant_min_pontos, 
                          req.body.datacriacao, 
-                         req.body.cor, 
-                         req.body.situacao == true ? "A" : "I"]
+                         req.body.cor]
             }
             var q2 = {
-                text : 'insert into tb_endereco (complemento, cep, nomejogador) values ($1, $2, $3) returning codigo, complemento, cep;',
-                values: [req.body.endereco.complemento, 
-                         req.body.endereco.cep, 
+                text : 'insert into tb_patente (complemento, cep, nomejogador) values ($1, $2, $3) returning codigo, complemento, cep;',
+                values: [req.body.patente.complemento, 
+                         req.body.patente.cep, 
                          req.body.nome]
             }
             console.log(q1);
@@ -215,7 +214,7 @@ sw.post('/insertpatente', function (req, res, next) {
 
                                 try {                          
         
-                                    await client.query('insert into tb_jogador_conquista_patente (codpatente, nome) values ($1, $2)', [req.body.patentes[i].codigo, req.body.nome])
+                                    await client.query('insert into tb_patente_conquista_patente (codpatente, nome) values ($1, $2)', [req.body.patentes[i].codigo, req.body.nome])
         
                                 } catch (err) {
                                                                 
@@ -225,15 +224,13 @@ sw.post('/insertpatente', function (req, res, next) {
                             }                            
 
                             done(); // closing the connection;
-                            console.log('retornou 201 no insertjogador');
+                            console.log('retornou 201 no insertpatente');
                             res.status(201).send({"nome" : result1.rows[0].nome, 
                                                   "quant_min_pontos": result1.rows[0].quant_min_pontos, 
                                                   "datacriacao": result1.rows[0].datacriacao, 
                                                   "cor": result1.rows[0].cor,
-                                                  "situacao": result1.rows[0].situacao,
                                                   "datacadastro" : result1.rows[0].datacadastro,
-                                                  "data_ultimo_login" : result1.rows[0].data_ultimo_login,
-                                                  "endereco": {"codigo": result2.rows[0].codigo, "cep": result2.rows[0].cep, "complemento": result2.rows[0].complemento},
+                                                  "patente": {"codigo": result2.rows[0].codigo, "cep": result2.rows[0].cep, "complemento": result2.rows[0].complemento},
                                                   "patentes": req.body.patentes});
                         }
                     });
