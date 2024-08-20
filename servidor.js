@@ -165,80 +165,134 @@ sw.get('/listjogadores', function (req, res, next) {
 
 
 
-
-
-
 sw.post('/insertpatente', function (req, res, next) {
-    
-    postgres.connect(function(err,client,done) {
+    postgres.connect(function(err, client, done) {
+        if (err) {
+            console.log("Não conseguiu acessar o BD: " + err);
+            res.status(400).json({ error: err.message });
+            return;
+        }
 
-       if(err){
+        var q1 = {
+            text: 'INSERT INTO tb_patente (nome, quant_min_pontos, datacriacao, cor, logotipo) ' +
+                  'VALUES ($1, $2, now(), $3, $4) ' +
+                  'RETURNING codigo, nome, quant_min_pontos, to_char(datacriacao, \'dd/mm/yyyy\') as datacriacao, cor, logotipo',
+            values: [req.body.nome, 
+                     req.body.quant_min_pontos, 
+                     req.body.cor, 
+                     req.body.logotipo]
+        };
 
-           console.log("Nao conseguiu acessar o  BD "+ err);
-           res.status(400).send('{'+err+'}');
-       }else{            
+        console.log(q1);
 
-            var q1 ={
-                text: 'insert into tb_patente (nome, quant_min_pontos, datacriacao, cor, datacadastro, ' +
-                   ') ' +
-                ' values ($1,$2,$3,$4,now(), $5) ' +
-                                            'returning nome, quant_min_pontos, datacriacao, cor, ' +
-                                            ' to_char(datacadastro, \'dd/mm/yyyy\') as datacadastro, '
-                                           ,
-                values: [req.body.nome, 
-                         req.body.quant_min_pontos, 
-                         req.body.datacriacao, 
-                         req.body.cor]
+        client.query(q1, function(err, result1) {
+            done();
+
+            if (err) {
+                console.log('Erro ao inserir patente: ' + err);
+                res.status(400).json({ error: err.message });
+            } else {
+                console.log('Patente inserida com sucesso');
+                res.status(201).json(result1.rows[0]);
             }
-            var q2 = {
-                text : 'insert into tb_patente (complemento, cep, nomejogador) values ($1, $2, $3) returning codigo, complemento, cep;',
-                values: [req.body.patente.complemento, 
-                         req.body.patente.cep, 
-                         req.body.nome]
+        });
+    });
+});      
+
+
+
+
+
+
+
+sw.get('/removepatente', function (req, res, next) {
+    // Conectar ao banco de dados
+    postgres.connect(function(err, client, done) {
+        if (err) {
+            console.log("Não conseguiu acessar o BD: " + err);
+            res.status(400).json({ error: err.message });
+            return;
+        }
+
+        // Definir a consulta para remover a patente
+        var q1 = {
+            text: 'DELETE FROM tb_patente WHERE codigo = $1 RETURNING codigo',
+            values: [req.body.codigo]
+        };
+
+        console.log(q1);
+
+        // Executar a consulta
+        client.query(q1, function(err, result1) {
+            done(); // Sempre liberar o cliente de volta ao pool após a execução da consulta
+
+            if (err) {
+                console.log('Erro ao remover patente: ' + err);
+                res.status(400).json({ error: err.message });
+            } else if (result1.rowCount === 0) {
+                // Nenhuma linha foi afetada, patente não encontrada
+                res.status(404).json({ error: 'Patente não encontrada' });
+            } else {
+                console.log('Patente removida com sucesso');
+                res.status(200).json({ message: 'Patente removida com sucesso', codigo: result1.rows[0].codigo });
             }
-            console.log(q1);
-
-            client.query(q1, function(err,result1) {
-                if(err){
-                    console.log('retornou 400 no insert q1');
-                    res.status(400).send('{'+err+'}');
-                }else{
-                    client.query(q2, async function(err,result2) {
-                        if(err){
-                            console.log('retornou 400 no insert q2');
-                            res.status(400).send('{'+err+'}');
-                        }else{
-                        
-                            //insere todas as pantentes na tabela associativa.
-                            for(var i=0; i < req.body.patentes.length; i++){                                              
-
-                                try {                          
-        
-                                    await client.query('insert into tb_patente_conquista_patente (codpatente, nome) values ($1, $2)', [req.body.patentes[i].codigo, req.body.nome])
-        
-                                } catch (err) {
-                                                                
-                                    res.status(400).send('{'+err+'}');
-                                }                                           
-        
-                            }                            
-
-                            done(); // closing the connection;
-                            console.log('retornou 201 no insertpatente');
-                            res.status(201).send({"nome" : result1.rows[0].nome, 
-                                                  "quant_min_pontos": result1.rows[0].quant_min_pontos, 
-                                                  "datacriacao": result1.rows[0].datacriacao, 
-                                                  "cor": result1.rows[0].cor,
-                                                  "datacadastro" : result1.rows[0].datacadastro,
-                                                  "patente": {"codigo": result2.rows[0].codigo, "cep": result2.rows[0].cep, "complemento": result2.rows[0].complemento},
-                                                  "patentes": req.body.patentes});
-                        }
-                    });
-                }           
-            });
-       }       
+        });
     });
 });
+
+
+
+
+
+
+
+sw.post('/updatepatente', function (req, res, next) {
+    // Conectar ao banco de dados
+    postgres.connect(function(err, client, done) {
+        if (err) {
+            console.log("Não conseguiu acessar o BD: " + err);
+            res.status(400).json({ error: err.message });
+            return;
+        }
+
+        // Definir a consulta para atualizar a patente
+        var q1 = {
+            text: `UPDATE tb_patente 
+                       SET nome = $1, 
+                       quant_min_pontos = $2, 
+                       cor = $3, 
+                       logotipo = $4 
+                   WHERE codigo = $5 
+                   RETURNING codigo, nome, quant_min_pontos, to_char(datacriacao, 'dd/mm/yyyy') as datacriacao, cor, logotipo`,
+            values: [
+                req.body.nome, 
+                req.body.quant_min_pontos, 
+                req.body.cor, 
+                req.body.logotipo, 
+                req.body.codigo
+            ]
+        };
+
+        console.log(q1);
+
+        // Executar a consulta
+        client.query(q1, function(err, result1) {
+            done(); // Sempre liberar o cliente de volta ao pool após a execução da consulta
+
+            if (err) {
+                console.log('Erro ao atualizar patente: ' + err);
+                res.status(400).json({ error: err.message });
+            } else if (result1.rowCount === 0) {
+                // Nenhuma linha foi afetada, patente não encontrada
+                res.status(404).json({ error: 'Patente não encontrada' });
+            } else {
+                console.log('Patente atualizada com sucesso');
+                res.status(200).json(result1.rows[0]);
+            }
+        });
+    });
+});
+
 
 
 
