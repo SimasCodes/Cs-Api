@@ -126,9 +126,8 @@ sw.get('/listjogadores', function (req, res, next) {
            res.status(400).send('{'+err+'}');
        }else{            
       
-            var q ='select j.nickname, j.senha, 0 as patentes, e.cep ' +
-            'from tb_jogador j, tb_endereco e '+
-             'where e.nicknamejogador=j.nickname order by nickname asc;'
+            var q ='select j.nickname, j.senha, j.quantpontos, 0 as patentes, 0 as endereco ' +
+            'from tb_jogador j order by nickname asc;'
     //exerxicio 1 incluir todas as colunas tb_jogador
             client.query(q,async function(err,result) {
             
@@ -144,6 +143,11 @@ sw.get('/listjogadores', function (req, res, next) {
                             'tb_jogador_conquista_patente '+
                             'where nickname = $1', [result.rows[i].nickname])
                             result.rows[i].patentes = pj.rows;
+
+
+                            pj2 = await client.query('select j.codigo, j.complemento, j.cep ' +
+                            'from tb_endereco j where j.nicknamejogador = $1;', [result.rows[i].nickname])
+                            result.rows[i].endereco = pj2.rows;
                         }catch(err){
 
                         }
@@ -292,6 +296,67 @@ sw.post('/updatepatente', function (req, res, next) {
         });
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sw.post('/updatejogador', function (req, res, next) {
+    // Conectar ao banco de dados
+    postgres.connect(function(err, client, done) {
+        if (err) {
+            console.log("Não conseguiu acessar o BD: " + err);
+            res.status(400).json({ error: err.message });
+            return;
+        }
+
+        // Definir a consulta para atualizar a jogador
+        var q1 = {
+            text: `UPDATE tb_jogador 
+                       SET nome = $1, 
+                       quant_min_pontos = $2, 
+                       cor = $3, 
+                       logotipo = $4 
+                   WHERE codigo = $5 
+                   RETURNING codigo, nome, quant_min_pontos, to_char(datacriacao, 'dd/mm/yyyy') as datacriacao, cor, logotipo`,
+            values: [
+                req.body.nome, 
+                req.body.quant_min_pontos, 
+                req.body.cor, 
+                req.body.logotipo, 
+                req.body.codigo
+            ]
+        };
+
+        console.log(q1);
+
+        // Executar a consulta
+        client.query(q1, function(err, result1) {
+            done(); // Sempre liberar o cliente de volta ao pool após a execução da consulta
+
+            if (err) {
+                console.log('Erro ao atualizar jogador: ' + err);
+                res.status(400).json({ error: err.message });
+            } else if (result1.rowCount === 0) {
+                // Nenhuma linha foi afetada, jogador não encontrada
+                res.status(404).json({ error: 'jogador não encontrada' });
+            } else {
+                console.log('jogador atualizada com sucesso');
+                res.status(200).json(result1.rows[0]);
+            }
+        });
+    });
+});
+
 
 
 
